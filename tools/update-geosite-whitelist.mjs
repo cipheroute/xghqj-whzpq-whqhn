@@ -6,6 +6,12 @@ if (!filePath || !rulesPath) {
   throw new Error('Usage: node tools/update-geosite-whitelist.mjs geosite-mini.dat whitelist-exact.txt');
 }
 
+const DOMAIN_TYPE = {
+  regex: 1,
+  domain: 2,
+  full: 3,
+};
+
 function readVarint(buffer, offset) {
   let value = 0;
   let shift = 0;
@@ -13,9 +19,7 @@ function readVarint(buffer, offset) {
   for (let index = offset; index < buffer.length; index += 1) {
     const byte = buffer[index];
     value += (byte & 0x7f) * (2 ** shift);
-    if ((byte & 0x80) === 0) {
-      return {value, nextOffset: index + 1};
-    }
+    if ((byte & 0x80) === 0) return {value, nextOffset: index + 1};
     shift += 7;
   }
 
@@ -78,37 +82,49 @@ function getStringField(fields, number) {
   return field ? field.value.toString('utf8') : undefined;
 }
 
-function domainMessage(rule) {
-  const value = Buffer.from(rule.slice('full:'.length), 'utf8');
+function parseDomainField(field) {
+  if (field.number !== 2 || field.wireType !== 2) return undefined;
+  const fields = readFields(field.value);
+  return {
+    type: fields.find((item) => item.number === 1 && item.wireType === 0)?.value,
+    value: getStringField(fields, 2),
+  };
+}
+
+function encodeDomainField(type, value) {
+  const encodedValue = Buffer.from(value, 'utf8');
   const body = Buffer.concat([
-    Buffer.from([0x08, 0x02]), // Domain.Type = Full
+    Buffer.from([0x08]),
+    writeVarint(type),
     Buffer.from([0x12]),
-    writeVarint(value.length),
-    value,
+    writeVarint(encodedValue.length),
+    encodedValue,
   ]);
 
   return Buffer.concat([Buffer.from([0x12]), writeVarint(body.length), body]);
 }
 
-const rules = readFileSync(rulesPath, 'utf8')
+const exactHosts = readFileSync(rulesPath, 'utf8')
   .split(/\r?\n/u)
   .map((line) => line.trim())
-  .filter((line) => line && !line.startsWith('#'));
+  .filter((line) => line && !line.startsWith('#'))
+  .map((rule) => {
+    if (!rule.startsWith('full:') || rule.length === 'full:'.length) {
+      throw new Error('Only non-empty full: domain rules are supported.');
+    }
+    return rule.slice('full:'.length);
+  });
 
-if (rules.some((rule) => !rule.startsWith('full:') || rule.length === 'full:'.length)) {
-  throw new Error('Only non-empty full: domain rules are supported.');
-}
-
+const githubSubdomainRegex = '^.+\\.github\\.com$';
 const input = readFileSync(filePath);
 const output = [];
+const updatedSections = new Set();
 let offset = 0;
-let updated = false;
 
 while (offset < input.length) {
   const fieldStart = offset;
   const tag = readVarint(input, offset);
   offset = tag.nextOffset;
-
   if (tag.value !== 0x0a) throw new Error('Unexpected top-level GeoSiteList field.');
 
   const length = readVarint(input, offset);
@@ -120,37 +136,59 @@ while (offset < input.length) {
   const message = input.subarray(messageStart, messageEnd);
   const fields = readFields(message);
   const code = getStringField(fields, 1);
+  let additions = [];
 
-  if (code !== 'WHITELIST') {
+  const retainedFields = fields.filter((field) => {
+    const domain = parseDomainField(field);
+    if (!domain) return true;
+
+    if (code === 'WHITELIST' && exactHosts.includes(domain.value)) return false;
+
+    if (
+      code === 'GITHUB'
+      && exactHosts.includes('github.com')
+      && (
+        (domain.type === DOMAIN_TYPE.domain && domain.value === 'github.com')
+        || (domain.type === DOMAIN_TYPE.regex && domain.value === githubSubdomainRegex)
+      )
+    ) {
+      return false;
+    }
+
+    return true;
+  });
+
+  if (code === 'WHITELIST') {
+    additions = exactHosts.map((host) => encodeDomainField(DOMAIN_TYPE.full, host));
+    updatedSections.add(code);
+  } else if (code === 'GITHUB' && exactHosts.includes('github.com')) {
+    additions = [encodeDomainField(DOMAIN_TYPE.regex, githubSubdomainRegex)];
+    updatedSections.add(code);
+  }
+
+  if (additions.length === 0) {
     output.push(input.subarray(fieldStart, messageEnd));
     continue;
   }
 
-  const currentRules = new Set(
-    fields
-      .filter((field) => field.number === 2 && field.wireType === 2)
-      .map((field) => {
-        const domainFields = readFields(field.value);
-        const type = domainFields.find((item) => item.number === 1 && item.wireType === 0)?.value;
-        const domain = getStringField(domainFields, 2);
-        return type === 2 && domain ? `full:${domain}` : undefined;
-      })
-      .filter(Boolean),
-  );
-
-  const additions = rules.filter((rule) => !currentRules.has(rule));
-  const updatedMessage = additions.length === 0
-    ? message
-    : Buffer.concat([message, ...additions.map(domainMessage)]);
-
+  const updatedMessage = Buffer.concat([
+    ...retainedFields.map((field) => field.raw),
+    ...additions,
+  ]);
   output.push(Buffer.concat([Buffer.from([0x0a]), writeVarint(updatedMessage.length), updatedMessage]));
-  updated = additions.length > 0;
 }
 
-if (!updated) {
-  console.log('WHITELIST already contains every requested exact domain.');
+for (const requiredSection of ['WHITELIST', 'GITHUB']) {
+  if (!updatedSections.has(requiredSection)) {
+    throw new Error(`Missing required geosite section: ${requiredSection}`);
+  }
+}
+
+const updated = Buffer.concat(output);
+if (updated.equals(input)) {
+  console.log('Exact GitHub routing rules are already up to date.');
   process.exit(0);
 }
 
-writeFileSync(filePath, Buffer.concat(output));
-console.log(`Added ${rules.join(', ')} to WHITELIST.`);
+writeFileSync(filePath, updated);
+console.log('Applied exact github.com direct rule and GitHub-subdomains proxy rule.');
