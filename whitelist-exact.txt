@@ -1,0 +1,2 @@
+# Exact domains that must use the direct route without matching their subdomains.
+full:github.com
