@@ -4,3 +4,8 @@ full:github.com
 domain:whoosh.bike
 domain:wsh.bike
 domain:whoosh.app.link
+domain:whoosh-bike.ru
+domain:inappstory.ru
+domain:mindbox.ru
+domain:mindbox.mobi
+domain:smartcaptcha.yandexcloud.net

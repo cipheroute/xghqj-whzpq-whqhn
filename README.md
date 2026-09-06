@@ -4,12 +4,24 @@ Small geodata files for the Remnawave/Happ split-routing templates.
 
 ## CDN URLs
 
-Use a published version in production, for example `v1.0.3`:
+Use a published version in production, for example `v1.0.4`:
 
 ```text
-https://cdn.jsdelivr.net/gh/cipheroute/xghqj-whzpq-whqhn@v1.0.3/geosite-mini.dat
-https://cdn.jsdelivr.net/gh/cipheroute/xghqj-whzpq-whqhn@v1.0.3/geoip-mini.dat
+https://cdn.jsdelivr.net/gh/cipheroute/xghqj-whzpq-whqhn@v1.0.4/geosite-mini.dat
+https://cdn.jsdelivr.net/gh/cipheroute/xghqj-whzpq-whqhn@v1.0.4/geoip-mini.dat
 ```
+
+## Happ routing profile
+
+The versioned profile duplicates critical direct domains in `DirectSites`, so
+it works immediately even while Happ still has an older geosite file cached.
+Copy the only line from this file into the Remnawave Happ Routing field:
+
+```text
+https://cdn.jsdelivr.net/gh/cipheroute/xghqj-whzpq-whqhn@v1.0.4/happ-routing-onadd.txt
+```
+
+The decoded source profile is stored in `happ-routing.json`.
 
 `geosite-mini.dat` contains the merged custom Russian-domain rules.
 `geoip-mini.dat` contains the compact direct/private/whitelist IP rules.
