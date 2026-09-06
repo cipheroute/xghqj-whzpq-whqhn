@@ -1,16 +1,16 @@
 {
-  "Name": "Freedom VPN",
+  "Name": "WHOOSH direct v1.0.5",
   "GlobalProxy": "true",
-  "RouteOrder": "block-proxy-direct",
+  "RouteOrder": "block-direct-proxy",
   "RemoteDNSType": "DoU",
   "RemoteDNSDomain": "",
   "RemoteDNSIP": "8.8.8.8",
   "DomesticDNSType": "DoU",
   "DomesticDNSDomain": "",
   "DomesticDNSIP": "77.88.8.8",
-  "Geoipurl": "https://cdn.jsdelivr.net/gh/cipheroute/xghqj-whzpq-whqhn@v1.0.4/geoip-mini.dat",
-  "Geositeurl": "https://cdn.jsdelivr.net/gh/cipheroute/xghqj-whzpq-whqhn@v1.0.4/geosite-mini.dat",
-  "LastUpdated": "1788697779",
+  "Geoipurl": "https://cdn.jsdelivr.net/gh/cipheroute/xghqj-whzpq-whqhn@v1.0.5/geoip-mini.dat",
+  "Geositeurl": "https://cdn.jsdelivr.net/gh/cipheroute/xghqj-whzpq-whqhn@v1.0.5/geosite-mini.dat",
+  "LastUpdated": "1788710511",
   "DnsHosts": {
     "lkfl2.nalog.ru": "213.24.64.175",
     "lknpd.nalog.ru": "213.24.64.181"
@@ -28,6 +28,11 @@
     "domain:mindbox.ru",
     "domain:mindbox.mobi",
     "domain:smartcaptcha.yandexcloud.net",
+    "domain:firebaseinstallations.googleapis.com",
+    "domain:firebaseremoteconfig.googleapis.com",
+    "domain:firebaseremoteconfigrealtime.googleapis.com",
+    "domain:firebaseinappmessaging.googleapis.com",
+    "domain:firebase-settings.crashlytics.com",
     "geosite:microsoft",
     "geosite:apple",
     "geosite:epicgames",
@@ -79,7 +84,14 @@
   "DirectIp": [
     "geoip:private",
     "geoip:direct",
-    "geoip:whitelist"
+    "geoip:whitelist",
+    "217.16.29.17/32",
+    "84.201.147.93/32",
+    "188.72.103.4/32",
+    "158.160.210.100/32",
+    "188.72.103.124/32",
+    "84.252.130.113/32",
+    "84.201.151.229/32"
   ],
   "ProxySites": [
     "geosite:google-play",
@@ -132,4 +144,3 @@
   "FakeDNS": "false",
   "UseChunkFiles": "true"
 }
-

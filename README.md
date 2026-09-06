@@ -4,11 +4,11 @@ Small geodata files for the Remnawave/Happ split-routing templates.
 
 ## CDN URLs
 
-Use a published version in production, for example `v1.0.4`:
+Use a published version in production, for example `v1.0.5`:
 
 ```text
-https://cdn.jsdelivr.net/gh/cipheroute/xghqj-whzpq-whqhn@v1.0.4/geosite-mini.dat
-https://cdn.jsdelivr.net/gh/cipheroute/xghqj-whzpq-whqhn@v1.0.4/geoip-mini.dat
+https://cdn.jsdelivr.net/gh/cipheroute/xghqj-whzpq-whqhn@v1.0.5/geosite-mini.dat
+https://cdn.jsdelivr.net/gh/cipheroute/xghqj-whzpq-whqhn@v1.0.5/geoip-mini.dat
 ```
 
 ## Happ routing profile
@@ -18,7 +18,7 @@ it works immediately even while Happ still has an older geosite file cached.
 Copy the only line from this file into the Remnawave Happ Routing field:
 
 ```text
-https://cdn.jsdelivr.net/gh/cipheroute/xghqj-whzpq-whqhn@v1.0.4/happ-routing-onadd.txt
+https://cdn.jsdelivr.net/gh/cipheroute/xghqj-whzpq-whqhn@v1.0.5/happ-routing-onadd.txt
 ```
 
 The decoded source profile is stored in `happ-routing.json`.
