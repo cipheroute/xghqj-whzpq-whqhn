@@ -104,16 +104,25 @@ function encodeDomainField(type, value) {
   return Buffer.concat([Buffer.from([0x12]), writeVarint(body.length), body]);
 }
 
-const exactHosts = readFileSync(rulesPath, 'utf8')
+const whitelistRules = readFileSync(rulesPath, 'utf8')
   .split(/\r?\n/u)
   .map((line) => line.trim())
   .filter((line) => line && !line.startsWith('#'))
   .map((rule) => {
-    if (!rule.startsWith('full:') || rule.length === 'full:'.length) {
-      throw new Error('Only non-empty full: domain rules are supported.');
+    const match = /^(full|domain):(.+)$/u.exec(rule);
+    if (!match) {
+      throw new Error('Only non-empty full: and domain: rules are supported.');
     }
-    return rule.slice('full:'.length);
+
+    return {
+      type: DOMAIN_TYPE[match[1]],
+      value: match[2],
+    };
   });
+
+const exactHosts = whitelistRules
+  .filter((rule) => rule.type === DOMAIN_TYPE.full)
+  .map((rule) => rule.value);
 
 const githubSubdomainRegex = '^.+\\.github\\.com$';
 const input = readFileSync(filePath);
@@ -142,7 +151,12 @@ while (offset < input.length) {
     const domain = parseDomainField(field);
     if (!domain) return true;
 
-    if (code === 'WHITELIST' && exactHosts.includes(domain.value)) return false;
+    if (
+      code === 'WHITELIST'
+      && whitelistRules.some((rule) => rule.type === domain.type && rule.value === domain.value)
+    ) {
+      return false;
+    }
 
     if (
       code === 'GITHUB'
@@ -159,7 +173,7 @@ while (offset < input.length) {
   });
 
   if (code === 'WHITELIST') {
-    additions = exactHosts.map((host) => encodeDomainField(DOMAIN_TYPE.full, host));
+    additions = whitelistRules.map((rule) => encodeDomainField(rule.type, rule.value));
     updatedSections.add(code);
   } else if (code === 'GITHUB' && exactHosts.includes('github.com')) {
     additions = [encodeDomainField(DOMAIN_TYPE.regex, githubSubdomainRegex)];
@@ -186,9 +200,9 @@ for (const requiredSection of ['WHITELIST', 'GITHUB']) {
 
 const updated = Buffer.concat(output);
 if (updated.equals(input)) {
-  console.log('Exact GitHub routing rules are already up to date.');
+  console.log('Whitelist routing rules are already up to date.');
   process.exit(0);
 }
 
 writeFileSync(filePath, updated);
-console.log('Applied exact github.com direct rule and GitHub-subdomains proxy rule.');
+console.log('Applied whitelist direct rules and GitHub-subdomains proxy rule.');

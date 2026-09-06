@@ -4,18 +4,19 @@ Small geodata files for the Remnawave/Happ split-routing templates.
 
 ## CDN URLs
 
-Use a published version in production, for example `v1.0.2`:
+Use a published version in production, for example `v1.0.3`:
 
 ```text
-https://cdn.jsdelivr.net/gh/cipheroute/xghqj-whzpq-whqhn@v1.0.2/geosite-mini.dat
-https://cdn.jsdelivr.net/gh/cipheroute/xghqj-whzpq-whqhn@v1.0.2/geoip-mini.dat
+https://cdn.jsdelivr.net/gh/cipheroute/xghqj-whzpq-whqhn@v1.0.3/geosite-mini.dat
+https://cdn.jsdelivr.net/gh/cipheroute/xghqj-whzpq-whqhn@v1.0.3/geoip-mini.dat
 ```
 
 `geosite-mini.dat` contains the merged custom Russian-domain rules.
 `geoip-mini.dat` contains the compact direct/private/whitelist IP rules.
 
-Exact domains that must be routed directly without including their subdomains
-are tracked in `whitelist-exact.txt`. Apply them to `geosite-mini.dat` with:
+Domains that must be routed directly are tracked in `whitelist-exact.txt`.
+Use `full:` for an exact hostname or `domain:` for the hostname and all its
+subdomains. Apply the rules to `geosite-mini.dat` with:
 
 ```text
 node tools/update-geosite-whitelist.mjs geosite-mini.dat whitelist-exact.txt

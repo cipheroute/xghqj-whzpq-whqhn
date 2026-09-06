@@ -1,2 +1,6 @@
-# Exact domains that must use the direct route without matching their subdomains.
+# Domains that must use the direct route.
+# full: matches only the exact hostname; domain: also matches all subdomains.
 full:github.com
+domain:whoosh.bike
+domain:wsh.bike
+domain:whoosh.app.link
