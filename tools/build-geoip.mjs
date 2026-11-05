@@ -10,7 +10,7 @@
 //
 // «Всё RU по RIPE NCC» в DIRECT больше не берётся (решение 05-11-2026): сети, записанные
 // на Россию, но стоящие за границей, туда не попадают, если они не из списка компаний.
-// Файл RIPE (delegated-ripencc-extended) нужен для добавок ripe:XX и для отчёта.
+// Файл RIPE (delegated-ripencc-extended) нужен для добавок ripe:XX, ripe:XX&geo:YY и для отчёта.
 //
 // Источники качает tools/fetch-geoip-sources.sh; этот скрипт в сеть не ходит.
 // Без зависимостей, protobuf разбирается и пишется вручную, как в остальных tools/*.mjs.
@@ -327,19 +327,29 @@ function readRunet(path) {
   return {ranges, cidrs, ipv6, tags: entries.length, geo};
 }
 
-function readExtra(path, ripe) {
-  const ripeCountries = [];
+// Добавки: ripe:XX — все сети RIPE со страной XX; ripe:XX&geo:YY — сети RIPE со страной XX,
+// которые геобаза runetfreedom относит к стране YY (пересечение с её тегом YY); CIDR.
+function readExtra(path, ripe, runet) {
+  const ripeRules = new Map();
   const cidrRanges = [];
   let cidrLines = 0;
   readFileSync(path, 'utf8').split(/\r?\n/u).forEach((rawLine, index) => {
     const line = rawLine.replace(/#.*$/u, '').trim();
     if (!line) return;
     const where = `${path}:${index + 1}`;
-    let match = /^ripe:([A-Za-z]{2})$/u.exec(line);
+    let match = /^ripe:([A-Za-z]{2})(?:&geo:([A-Za-z]{2}))?$/u.exec(line);
     if (match) {
       const country = match[1].toUpperCase();
+      const geoCode = match[2]?.toUpperCase();
       if (!ripe.byCountry.has(country)) throw new Error(`${where}: в RIPE нет сетей страны ${country}.`);
-      ripeCountries.push(country);
+      let ranges = ripe.byCountry.get(country);
+      if (geoCode) {
+        const geoTag = runet.geo.find(({code}) => code === geoCode);
+        if (!geoTag) throw new Error(`${where}: в геобазе runetfreedom нет тега ${geoCode}.`);
+        ranges = intersect(ranges, geoTag.ranges);
+      }
+      const label = geoCode ? `ripe:${country}&geo:${geoCode}` : `ripe:${country}`;
+      if (!ripeRules.has(label)) ripeRules.set(label, {label, ranges});
       return;
     }
     if (line.includes(':')) throw new Error(`${where}: IPv6 в DIRECT не добавляем: ${line}`);
@@ -351,7 +361,7 @@ function readExtra(path, ripe) {
     cidrRanges.push(cidrRange(start, prefix));
     cidrLines += 1;
   });
-  return {ripeCountries: [...new Set(ripeCountries)], cidrs: merge(cidrRanges), cidrLines};
+  return {ripeRules: [...ripeRules.values()], cidrs: merge(cidrRanges), cidrLines};
 }
 
 function readSources(path) {
@@ -572,8 +582,8 @@ const baselines = [
 const ripe = readRipe(args.ripe);
 const ripeRu = ripe.byCountry.get('RU') ?? [];
 const runet = readRunet(args.runet);
-const extra = readExtra(args.extra, ripe);
-const extraRipe = extra.ripeCountries.map((country) => ({country, ranges: ripe.byCountry.get(country)}));
+const extra = readExtra(args.extra, ripe, runet);
+const extraRipe = extra.ripeRules;
 
 if (total(ripeRu) < MIN_SOURCE_ADDRESSES) errors.push(`В RIPE у RU всего ${fmt(total(ripeRu))} адресов — источник битый?`);
 if (total(runet.ranges) < MIN_SOURCE_ADDRESSES) errors.push(`У runetfreedom в RU всего ${fmt(total(runet.ranges))} адресов — источник битый?`);
@@ -623,7 +633,7 @@ const asnUnion = merge(asnResults.flatMap((result) => result.ranges));
 const sourceParts = [
   {label: 'geoip:ru', ranges: runet.ranges},
   {label: 'ASN', ranges: asnUnion},
-  ...extraRipe.map(({country, ranges}) => ({label: `ripe:${country}`, ranges})),
+  ...extraRipe.map(({label, ranges}) => ({label, ranges})),
   {label: 'direct-extra CIDR', ranges: extra.cidrs},
 ];
 const directRanges = merge(sourceParts.flatMap((part) => part.ranges));
@@ -760,15 +770,15 @@ const asnExtra = subtract(asnUnion, runet.ranges);
 out(`Состав ${REBUILT_TAG} (IPv4)`);
 out(`  geoip:ru runetfreedom: ${fmt(total(runet.ranges))} адресов (${fmt(runet.cidrs)} CIDR; IPv6 пропущено: ${fmt(runet.ipv6)})`);
 out(`  сети компаний (ASN):   ${fmt(total(asnUnion))} адресов из ${asnResults.length} ASN; сверх geoip:ru — ${fmt(total(asnExtra))}`);
-for (const {country, ranges} of extraRipe) {
-  out(`  ripe:${country} (добавка):    ${fmt(total(ranges))} адресов; сверх geoip:ru и ASN — ${fmt(total(subtract(ranges, geoAndAsn)))}`);
+for (const {label, ranges} of extraRipe) {
+  out(`  ${label} (добавка): ${fmt(total(ranges))} адресов; сверх geoip:ru и ASN — ${fmt(total(subtract(ranges, geoAndAsn)))}`);
 }
 out(`  CIDR из добавок:       ${fmt(total(extra.cidrs))} адресов (${fmt(extra.cidrLines)} строк)`);
 out(`  из добавок уже есть в geoip:ru ∪ ASN: ${fmt(total(extraCovered))} адресов`);
 out(`  итого:                 ${fmt(total(directRanges))} адресов, ${fmt(directRanges.length)} отрезков, ${fmt(directCidrs.length)} CIDR`);
 out(`  IPv6 из прошлого файла перенесено без изменений: ${fmt(prev.v6Fields.length)} CIDR`);
 if (prev.otherFields.length) out(`  прочих полей записи перенесено: ${prev.otherFields.length}`);
-out(`  RIPE RU как источник DIRECT не берётся — только ripe:XX из добавок и этот отчёт.`);
+out(`  RIPE RU целиком как источник DIRECT не берётся — только правила ripe:… из добавок и этот отчёт.`);
 out();
 
 const ripeRuNotGeo = subtract(ripeRu, runet.ranges);

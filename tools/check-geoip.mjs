@@ -4,7 +4,8 @@
 //    код — первым полем записи (ядро ищет тег именно так), CIDR больше нуля, адреса по 4/16 байт,
 //    без лишних бит хоста; с --prev — PRIVATE и WHITELIST побайтно как в прошлом файле.
 //    Адреса с известным ответом (KNOWN): сети компаний из direct-asn.txt — в DIRECT, в том
-//    числе их сети за границей; крупные зарубежные хостинги в Германии — не в DIRECT.
+//    числе их сети за границей; сети RIPE RU с геобазой UA — в DIRECT; крупные зарубежные
+//    хостинги в Германии — не в DIRECT.
 // 2. С --xray — настоящее ядро:
 //    - `xray run -test` с правилами geoip:private, geoip:whitelist, geoip:direct
 //      (XRAY_LOCATION_ASSET — временная папка, где файл лежит как geoip.dat);
@@ -37,6 +38,7 @@ const KNOWN = [
   ['89.208.218.1', 'DIRECT', true, 'VK, сеть AS47764 вне geoip:ru'],
   ['84.252.149.206', 'DIRECT', true, 'Сбер, sberbank.ru'],
   ['185.85.15.46', 'DIRECT', true, 'Касперский, kaspersky.com (AS200107, вне geoip:ru)'],
+  ['109.254.0.1', 'DIRECT', true, 'RIPE RU, геобаза UA (добавка ripe:RU&geo:UA)'],
   ['5.9.0.1', 'DIRECT', false, 'Hetzner, Германия'],
   ['57.129.0.1', 'DIRECT', false, 'OVH, Германия'],
   ['8.8.8.8', 'DIRECT', false, 'Google DNS'],
