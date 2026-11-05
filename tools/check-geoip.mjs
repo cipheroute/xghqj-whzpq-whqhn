@@ -3,13 +3,17 @@
 // 1. Свой разбор файла (отдельный от сборщика): теги DIRECT, PRIVATE, WHITELIST на месте,
 //    код — первым полем записи (ядро ищет тег именно так), CIDR больше нуля, адреса по 4/16 байт,
 //    без лишних бит хоста; с --prev — PRIVATE и WHITELIST побайтно как в прошлом файле.
+//    Адреса с известным ответом (KNOWN): сети компаний из direct-asn.txt — в DIRECT, в том
+//    числе их сети за границей; крупные зарубежные хостинги в Германии — не в DIRECT.
 // 2. С --xray — настоящее ядро:
 //    - `xray run -test` с правилами geoip:private, geoip:whitelist, geoip:direct
 //      (XRAY_LOCATION_ASSET — временная папка, где файл лежит как geoip.dat);
 //    - тот же конфиг с несуществующим тегом обязан упасть — значит, файл действительно читается;
 //    - ядро запускается с SOCKS на 127.0.0.1 и выходами-blackhole (наружу ничего не уходит);
 //      через него открываются соединения на выборку адресов, а по журналу доступа
-//      сверяется, в какой выход ядро отправило каждый адрес.
+//      сверяется, в какой выход ядро отправило каждый адрес;
+//    - отдельный запуск с правилом geoip:direct первым — для адресов KNOWN: адреса компаний
+//      часто есть и в WHITELIST, который в первом запуске стоит раньше DIRECT.
 //
 // node tools/check-geoip.mjs --dat geoip-mini.dat [--prev old.dat] [--xray path/to/xray] [--append build-report.txt]
 
@@ -23,6 +27,21 @@ import {parseArgs} from 'node:util';
 const TAGS = ['PRIVATE', 'WHITELIST', 'DIRECT']; // порядок правил в тестовом конфиге
 const RANDOM_PROBES = 300;
 const SAMPLES_PER_TAG = 40;
+// [адрес, тег, должен ли быть в теге, что это]. Адреса публичные: сайты и сети компаний,
+// диапазоны хостингов. Своих адресов сюда не класть — файл в публичном репозитории.
+const KNOWN = [
+  ['77.88.8.8', 'DIRECT', true, 'Яндекс DNS'],
+  ['77.88.55.88', 'DIRECT', true, 'Яндекс, yandex.ru'],
+  ['5.45.213.1', 'DIRECT', true, 'Яндекс, сеть AS13238 вне geoip:ru'],
+  ['87.240.132.67', 'DIRECT', true, 'VK, vk.com'],
+  ['89.208.218.1', 'DIRECT', true, 'VK, сеть AS47764 вне geoip:ru'],
+  ['84.252.149.206', 'DIRECT', true, 'Сбер, sberbank.ru'],
+  ['185.85.15.46', 'DIRECT', true, 'Касперский, kaspersky.com (AS200107, вне geoip:ru)'],
+  ['5.9.0.1', 'DIRECT', false, 'Hetzner, Германия'],
+  ['57.129.0.1', 'DIRECT', false, 'OVH, Германия'],
+  ['8.8.8.8', 'DIRECT', false, 'Google DNS'],
+  ['10.1.2.3', 'PRIVATE', true, 'частная сеть'],
+];
 
 const {values: args} = parseArgs({
   options: {
@@ -167,10 +186,15 @@ for (const tag of TAGS) {
   if (entry.v4Count + entry.v6 === 0) fail(`в теге ${tag} нет CIDR`);
   if (entry.bad) fail(`в теге ${tag} битых CIDR: ${entry.bad}`);
 }
-// здравый смысл: Яндекс-DNS — в DIRECT, 10/8 — в PRIVATE, Google DNS — не в DIRECT
-for (const [address, tag, inside] of [['77.88.8.8', 'DIRECT', true], ['10.1.2.3', 'PRIVATE', true], ['8.8.8.8', 'DIRECT', false]]) {
-  const entry = dat.entries.get(tag);
-  if (entry && contains(entry.v4, ip4Number(address)) !== inside) fail(`${address} ${inside ? 'не' : ''} в ${tag}`);
+{
+  let ok = 0;
+  for (const [address, tag, inside, what] of KNOWN) {
+    const entry = dat.entries.get(tag);
+    if (!entry) continue;
+    if (contains(entry.v4, ip4Number(address)) === inside) ok += 1;
+    else fail(`${address} (${what}) ${inside ? 'не в' : 'в'} ${tag}`);
+  }
+  log(`  адреса с известным ответом: ${ok} из ${KNOWN.length} как надо`);
 }
 if (args.prev) {
   const prev = parseGeoIP(args.prev);
@@ -256,6 +280,59 @@ function probeAddresses() {
   });
 }
 
+// Поднимает ядро с правилами geoip:<тег> → t-<тег> в заданном порядке, открывает соединения
+// на адреса и возвращает по журналу доступа, какой выход выбран для каждого адреса.
+async function routeWithXray(xrayPath, dir, env, tags, addresses, name) {
+  const port = await freePort();
+  const accessLog = join(dir, `access-${name}.log`);
+  const configPath = join(dir, `config-${name}.json`);
+  writeFileSync(configPath, JSON.stringify({
+    log: {loglevel: 'warning', access: accessLog},
+    inbounds: [{tag: 'in', listen: '127.0.0.1', port, protocol: 'socks', settings: {auth: 'noauth', udp: false}}],
+    outbounds: ['miss', ...tags.map((tag) => `t-${tag.toLowerCase()}`)].map((tag) => ({tag, protocol: 'blackhole'})),
+    routing: {
+      domainStrategy: 'AsIs',
+      rules: tags.map((tag) => ({type: 'field', ip: [`geoip:${tag.toLowerCase()}`], outboundTag: `t-${tag.toLowerCase()}`})),
+    },
+  }, null, 2));
+  const server = spawn(xrayPath, ['run', '-c', configPath], {env, stdio: ['ignore', 'pipe', 'pipe']});
+  const killServer = () => server.kill('SIGKILL');
+  process.once('exit', killServer); // ядро не должно пережить проверку, даже если она упала
+  let serverOutput = '';
+  server.stdout.on('data', (data) => { serverOutput += data; });
+  server.stderr.on('data', (data) => { serverOutput += data; });
+  try {
+    let up = false;
+    for (let attempt = 0; attempt < 100 && !up; attempt += 1) {
+      up = await new Promise((done) => {
+        const socket = connect({host: '127.0.0.1', port}, () => {
+          socket.destroy();
+          done(true);
+        });
+        socket.once('error', () => done(false));
+      });
+      if (!up) await sleep(100);
+    }
+    if (!up) {
+      fail(`ядро не открыло SOCKS: ${serverOutput.trim().split('\n').slice(-3).join(' | ')}`);
+      return undefined;
+    }
+    for (let index = 0; index < addresses.length; index += 16) {
+      await Promise.all(addresses.slice(index, index + 16).map((address) => socksProbe(port, address)));
+    }
+    await sleep(1500);
+    const routed = new Map();
+    for (const line of readFileSync(accessLog, 'utf8').split('\n')) {
+      const match = /accepted tcp:(\d+\.\d+\.\d+\.\d+):80 \[in (?:->|>>) ([\w-]+)\]/u.exec(line);
+      if (match) routed.set(match[1], match[2]);
+    }
+    return routed;
+  } finally {
+    server.kill('SIGTERM');
+    process.off('exit', killServer);
+  }
+}
+
 async function checkXray(xrayPath) {
   log('');
   log(`Проверка ядром (${basename(xrayPath)})`); // без полного пути: отчёт уходит в публичный репозиторий
@@ -297,56 +374,36 @@ async function checkXray(xrayPath) {
     if (negative.status !== 0) log('  несуществующий тег ядро отвергает — файл действительно читается');
     else fail('конфиг с несуществующим тегом прошёл -test — проверка ничего не доказывает');
 
-    const server = spawn(xrayPath, ['run', '-c', goodConfig], {env, stdio: ['ignore', 'pipe', 'pipe']});
-    const killServer = () => server.kill('SIGKILL');
-    process.once('exit', killServer); // ядро не должно пережить проверку, даже если она упала
-    let serverOutput = '';
-    server.stdout.on('data', (data) => { serverOutput += data; });
-    server.stderr.on('data', (data) => { serverOutput += data; });
-    try {
-      let up = false;
-      for (let attempt = 0; attempt < 100 && !up; attempt += 1) {
-        up = await new Promise((done) => {
-          const socket = connect({host: '127.0.0.1', port}, () => {
-            socket.destroy();
-            done(true);
-          });
-          socket.once('error', () => done(false));
-        });
-        if (!up) await sleep(100);
+    const addresses = probeAddresses();
+    const routed = await routeWithXray(xrayPath, dir, env, TAGS, addresses, 'routing');
+    if (!routed) return;
+    const counts = {};
+    let mismatches = 0;
+    for (const address of addresses) {
+      const expected = expectedOutbound(ip4Number(address));
+      const actual = routed.get(address);
+      counts[expected] = (counts[expected] ?? 0) + 1;
+      if (actual !== expected) {
+        mismatches += 1;
+        if (mismatches <= 10) fail(`${address}: ждали ${expected}, ядро — ${actual ?? 'нет в журнале'}`);
       }
-      if (!up) {
-        fail(`ядро не открыло SOCKS: ${serverOutput.trim().split('\n').slice(-3).join(' | ')}`);
-        return;
-      }
-      const addresses = probeAddresses();
-      for (let index = 0; index < addresses.length; index += 16) {
-        await Promise.all(addresses.slice(index, index + 16).map((address) => socksProbe(port, address)));
-      }
-      await sleep(1500);
-      const routed = new Map();
-      for (const line of readFileSync(accessLog, 'utf8').split('\n')) {
-        const match = /accepted tcp:(\d+\.\d+\.\d+\.\d+):80 \[in (?:->|>>) ([\w-]+)\]/u.exec(line);
-        if (match) routed.set(match[1], match[2]);
-      }
-      const counts = {};
-      let mismatches = 0;
-      for (const address of addresses) {
-        const expected = expectedOutbound(ip4Number(address));
-        const actual = routed.get(address);
-        counts[expected] = (counts[expected] ?? 0) + 1;
-        if (actual !== expected) {
-          mismatches += 1;
-          if (mismatches <= 10) fail(`${address}: ждали ${expected}, ядро — ${actual ?? 'нет в журнале'}`);
-        }
-      }
-      log(`  маршрутизация ядром: ${addresses.length} адресов, совпало ${addresses.length - mismatches}`
-        + ` (${Object.entries(counts).map(([tag, count]) => `${tag} ${count}`).join(', ')})`);
-      if (mismatches > 10) fail(`и ещё ${mismatches - 10} расхождений`);
-    } finally {
-      server.kill('SIGTERM');
-      process.off('exit', killServer);
     }
+    log(`  маршрутизация ядром: ${addresses.length} адресов, совпало ${addresses.length - mismatches}`
+      + ` (${Object.entries(counts).map(([tag, count]) => `${tag} ${count}`).join(', ')})`);
+    if (mismatches > 10) fail(`и ещё ${mismatches - 10} расхождений`);
+
+    // DIRECT первым правилом: адреса компаний часто есть и в WHITELIST
+    const knownTags = ['DIRECT', ...TAGS.filter((tag) => tag !== 'DIRECT')];
+    const knownRouted = await routeWithXray(xrayPath, dir, env, knownTags, KNOWN.map(([address]) => address), 'known');
+    if (!knownRouted) return;
+    let knownOk = 0;
+    for (const [address, tag, inside, what] of KNOWN) {
+      const outbound = `t-${tag.toLowerCase()}`;
+      const actual = knownRouted.get(address);
+      if (actual !== undefined && (actual === outbound) === inside) knownOk += 1;
+      else fail(`${address} (${what}): ядро отправило в ${actual ?? '— (нет в журнале)'}, а ждали ${inside ? '' : 'не '}${outbound}`);
+    }
+    log(`  адреса с известным ответом (правило geoip:direct первым): ${knownOk} из ${KNOWN.length} как надо`);
   } finally {
     rmSync(dir, {recursive: true, force: true});
   }
