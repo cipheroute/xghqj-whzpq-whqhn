@@ -1,6 +1,9 @@
 # Ежемесячная сборка geoip-mini.dat (README, раздел «Сборка geoip»).
-# Собирает файл из свежих источников, проверяет его настоящим xray и открывает
-# pull request из ветки geoip-auto в main. Тегов не ставит и в main сам не пишет.
+# Собирает файл из свежих источников (runetfreedom, RIPE, анонсы ASN из direct-asn.txt
+# по RIPEstat), проверяет его настоящим xray и открывает pull request из ветки
+# geoip-auto в main. Тегов не ставит и в main сам не пишет. Если RIPEstat по какому-то
+# ASN не ответил, сборка не падает: берёт его префиксы из direct-asn-cache.txt и пишет
+# об этом в отчёте. Предохранитель потери DIRECT здесь всегда включён (без --allow-shrink).
 name: geoip-monthly
 
 on:
@@ -23,7 +26,7 @@ jobs:
   build:
     name: Сборка и проверка
     runs-on: ubuntu-24.04
-    timeout-minutes: 20
+    timeout-minutes: 30
     permissions:
       contents: read
     steps:
@@ -37,7 +40,7 @@ jobs:
         with:
           node-version: '24'
 
-      - name: Источники (RIPE, runetfreedom)
+      - name: Источники (RIPE, runetfreedom, RIPEstat)
         run: tools/fetch-geoip-sources.sh "$RUNNER_TEMP/geoip-src"
 
       - name: Xray
@@ -59,6 +62,9 @@ jobs:
             --runet "$RUNNER_TEMP/geoip-src/runet-geoip.dat" \
             --sources "$RUNNER_TEMP/geoip-src/sources.txt" \
             --extra direct-extra.txt \
+            --asn direct-asn.txt \
+            --asn-dir "$RUNNER_TEMP/geoip-src/asn" \
+            --asn-cache direct-asn-cache.txt \
             --out geoip-mini.dat \
             --report build-report.txt
 
@@ -85,6 +91,7 @@ jobs:
             geoip-mini.dat
             geoip-mini.dat.sha256
             build-report.txt
+            direct-asn-cache.txt
           if-no-files-found: error
           retention-days: 30
 
@@ -116,7 +123,7 @@ jobs:
           BUILD_DIR: ${{ runner.temp }}/geoip-build
         run: |
           set -euo pipefail
-          for f in geoip-mini.dat geoip-mini.dat.sha256 build-report.txt; do
+          for f in geoip-mini.dat geoip-mini.dat.sha256 build-report.txt direct-asn-cache.txt; do
             cp "$BUILD_DIR/$f" "./$f"
           done
           if git diff --quiet -- geoip-mini.dat; then
@@ -128,13 +135,15 @@ jobs:
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
           git switch --force-create geoip-auto
-          git add geoip-mini.dat geoip-mini.dat.sha256 build-report.txt
+          git add geoip-mini.dat geoip-mini.dat.sha256 build-report.txt direct-asn-cache.txt
           git commit --quiet --message "$title"
           git push --force origin geoip-auto
           {
             echo "Сборка \`geoip-mini.dat\` за $month, проверена xray ${XRAY_VERSION}."
             echo
             echo 'Выкладка — README, раздел «Сборка geoip»: слить PR → тег vX → дождаться отдачи файла через jsDelivr → только потом менять заголовок routing в панели.'
+            echo
+            echo 'В отчёте посмотреть: «ВНИМАНИЕ» (ASN из кэша, смена держателя), «RIPE RU, но не в России по геобазе», вклад ASN, крупнейшие убранные.'
             echo
             echo '```text'
             head -c 60000 build-report.txt
