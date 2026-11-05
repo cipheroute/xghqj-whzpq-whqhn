@@ -1,0 +1,75 @@
+Сборка geoip-mini.dat — 2026-11-05T17:53:12Z
+
+Источники
+  fetched_at=2026-11-05T17:42:04Z
+  ripe_url=https://ftp.ripe.net/pub/stats/ripencc/delegated-ripencc-extended-latest
+  ripe_header=2|ripencc|1793833199|261193|19700101|20261104|+0100
+  ripe_md5=3edbea24b78ce1cc65fded8b570a38da (сходится с .md5)
+  runet_release=https://github.com/runetfreedom/russia-v2ray-rules-dat/releases/tag/202611051123
+  runet_sha256=d46c85ee9e5798806b0e706aeadbc50a95124cf18be1ce0126bf717b805db4e6 (сходится с geoip.dat.sha256sum)
+  прошлый файл: prev-v1.0.6-geoip-mini.dat, sha256 a1b7c533aa5b7fedbf5c0f2fbb8f55471cb6cea55673385dd05a2c4da56702db
+
+Теги (CIDR / IPv4-адресов; было → стало)
+  DIRECT     CIDR 35 987 → 14 944 (−21 043), из них IPv6: 85; адресов 48 992 858 → 49 647 332 (+654 474)
+  PRIVATE    CIDR 17 → 17 (0), из них IPv6: 4; адресов 575 931 648 → 575 931 648 (0) — перенесён побайтно
+  WHITELIST  CIDR 6 710 → 6 710 (0); адресов 219 006 → 219 006 (0) — перенесён побайтно
+
+Состав DIRECT (IPv4)
+  RIPE RU:            45 250 880 адресов (7 413 слитых отрезков)
+  runetfreedom RU:    45 723 705 адресов (13 069 CIDR; IPv6 пропущено: 12 175)
+  ripe:BY (добавка): 1 793 536 адресов
+  CIDR из добавок:    1 088 060 адресов (4 115 строк)
+  из добавок уже есть в RIPE RU ∪ runetfreedom: 0 адресов
+  итого:              49 647 332 адресов, 11 562 отрезков, 14 859 CIDR
+  IPv6 из прошлого файла перенесено без изменений: 85 CIDR
+
+Изменения DIRECT относительно прошлого файла
+  добавилось: 654 474 адресов, 4 737 отрезков
+  убралось:   0 адресов, 0 отрезков
+  крупнейшие добавленные (до 20):
+    + 145.249.120.0–145.249.255.255 (34 816) — RIPE RU
+    + 57.87.0.0/17 (32 768) — runetfreedom RU
+    + 145.249.0.0–145.249.107.255 (27 648) — RIPE RU
+    + 159.200.128.0/18 (16 384) — RIPE RU + runetfreedom RU
+    + 178.171.0.0–178.171.56.255 (14 592) — RIPE RU + runetfreedom RU
+    + 5.153.128.0–5.153.175.255 (12 288) — RIPE RU
+    + 168.113.128.0–168.113.175.255 (12 288) — RIPE RU + runetfreedom RU
+    + 158.46.190.0–158.46.223.255 (8 704) — RIPE RU
+    + 212.124.96.0/19 (8 192) — RIPE RU + runetfreedom RU
+    + 31.204.3.0–31.204.31.255 (7 424) — RIPE RU
+    + 158.46.143.0–158.46.167.255 (6 400) — RIPE RU + runetfreedom RU
+    + 89.184.0.0–89.184.21.255 (5 632) — RIPE RU + runetfreedom RU
+    + 94.159.96.0–94.159.112.255 (4 352) — RIPE RU
+    + 85.28.48.0/20 (4 096) — RIPE RU + runetfreedom RU
+    + 109.238.192.0/20 (4 096) — RIPE RU
+    + 137.22.144.0/20 (4 096) — RIPE RU + runetfreedom RU
+    + 160.5.208.0/20 (4 096) — RIPE RU + runetfreedom RU
+    + 46.149.128.0–46.149.141.255 (3 584) — RIPE RU
+    + 147.45.66.0–147.45.79.255 (3 584) — RIPE RU
+    + 94.187.192.0–94.187.203.255 (3 072) — RIPE RU + runetfreedom RU
+  крупнейшие убранные (до 20):
+    нет
+
+Файл
+  размер: 428 248 → 217 818 байт (−49.1 %; предел +20 %)
+  sha256: a2833779c124fe3db0ed183a298272edeeb3461ab3d51c83b849c4545a59d78f
+
+Проверки сборки
+  теги на месте и в прежнем порядке: DIRECT, PRIVATE, WHITELIST
+  PRIVATE, WHITELIST — побайтно как в прошлом файле
+  итог: ok
+
+Проверка файла своим разбором
+  теги: DIRECT, PRIVATE, WHITELIST
+  PRIVATE: IPv4 CIDR 13, адресов 575931648, IPv6 CIDR 4
+  WHITELIST: IPv4 CIDR 6710, адресов 219006, IPv6 CIDR 0
+  DIRECT: IPv4 CIDR 14859, адресов 49647332, IPv6 CIDR 85
+  PRIVATE побайтно как в прошлом файле
+  WHITELIST побайтно как в прошлом файле
+
+Проверка ядром (xray31-darwin)
+  Xray 26.10.31 (Xray, Penetrates Everything.) a4a3dff (go1.27.2 darwin/arm64)
+  xray run -test (geoip:private, geoip:whitelist, geoip:direct): Configuration OK
+  несуществующий тег ядро отвергает — файл действительно читается
+  маршрутизация ядром: 616 адресов, совпало 616 (t-whitelist 70, miss 359, t-private 24, t-direct 163)
+  итог проверки: ok
