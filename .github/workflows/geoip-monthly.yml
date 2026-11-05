@@ -1,0 +1,147 @@
+# Ежемесячная сборка geoip-mini.dat (README, раздел «Сборка geoip»).
+# Собирает файл из свежих источников, проверяет его настоящим xray и открывает
+# pull request из ветки geoip-auto в main. Тегов не ставит и в main сам не пишет.
+name: geoip-monthly
+
+on:
+  schedule:
+    - cron: '37 3 2 * *' # 2-го числа каждого месяца, 03:37 UTC
+  workflow_dispatch:
+
+permissions: {}
+
+concurrency:
+  group: geoip-monthly
+  cancel-in-progress: false
+
+env:
+  XRAY_VERSION: v26.10.31
+  # sha256 Xray-linux-64.zip этого выпуска; сверено с Xray-linux-64.zip.dgst 05-11-2026
+  XRAY_SHA256: e4bd9119f50ae7c41658b1abd0679ae06f98bd864a2907ff33f2f2cf7081b214
+
+jobs:
+  build:
+    name: Сборка и проверка
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Node
+        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: '24'
+
+      - name: Источники (RIPE, runetfreedom)
+        run: tools/fetch-geoip-sources.sh "$RUNNER_TEMP/geoip-src"
+
+      - name: Xray
+        run: |
+          mkdir "$RUNNER_TEMP/xray"
+          cd "$RUNNER_TEMP/xray"
+          curl --fail --silent --show-error --location --proto '=https' --tlsv1.2 --retry 3 \
+            -o xray.zip "https://github.com/XTLS/Xray-core/releases/download/${XRAY_VERSION}/Xray-linux-64.zip"
+          echo "${XRAY_SHA256}  xray.zip" | sha256sum --check --strict
+          unzip -q xray.zip xray
+          ./xray version
+
+      - name: Сборка
+        run: |
+          cp geoip-mini.dat "$RUNNER_TEMP/prev-geoip-mini.dat"
+          node tools/build-geoip.mjs \
+            --prev "$RUNNER_TEMP/prev-geoip-mini.dat" \
+            --ripe "$RUNNER_TEMP/geoip-src/ripe.txt" \
+            --runet "$RUNNER_TEMP/geoip-src/runet-geoip.dat" \
+            --sources "$RUNNER_TEMP/geoip-src/sources.txt" \
+            --extra direct-extra.txt \
+            --out geoip-mini.dat \
+            --report build-report.txt
+
+      - name: Проверка (свой разбор и xray)
+        run: |
+          node tools/check-geoip.mjs \
+            --dat geoip-mini.dat \
+            --prev "$RUNNER_TEMP/prev-geoip-mini.dat" \
+            --xray "$RUNNER_TEMP/xray/xray" \
+            --append build-report.txt
+
+      - name: Отчёт в сводку запуска
+        if: always()
+        run: |
+          if [ -f build-report.txt ]; then
+            { echo '```text'; cat build-report.txt; echo '```'; } >> "$GITHUB_STEP_SUMMARY"
+          fi
+
+      - name: Сохранить результат
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: geoip-build
+          path: |
+            geoip-mini.dat
+            geoip-mini.dat.sha256
+            build-report.txt
+          if-no-files-found: error
+          retention-days: 30
+
+  pull-request:
+    name: PR в main
+    needs: build
+    # с других веток — только сборка и проверка, без PR
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    permissions:
+      contents: write # push в ветку geoip-auto
+      pull-requests: write # открыть или обновить PR
+    steps:
+      - name: Checkout main
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: main
+
+      - name: Забрать результат сборки
+        uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
+        with:
+          name: geoip-build
+          path: ${{ runner.temp }}/geoip-build
+
+      - name: Ветка geoip-auto и PR
+        env:
+          GH_TOKEN: ${{ github.token }}
+          BUILD_DIR: ${{ runner.temp }}/geoip-build
+        run: |
+          set -euo pipefail
+          for f in geoip-mini.dat geoip-mini.dat.sha256 build-report.txt; do
+            cp "$BUILD_DIR/$f" "./$f"
+          done
+          if git diff --quiet -- geoip-mini.dat; then
+            echo "geoip-mini.dat не изменился — PR не нужен"
+            exit 0
+          fi
+          month=$(date -u +%Y-%m)
+          title="geoip: ежемесячная сборка $month"
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git switch --force-create geoip-auto
+          git add geoip-mini.dat geoip-mini.dat.sha256 build-report.txt
+          git commit --quiet --message "$title"
+          git push --force origin geoip-auto
+          {
+            echo "Сборка \`geoip-mini.dat\` за $month, проверена xray ${XRAY_VERSION}."
+            echo
+            echo 'Выкладка — README, раздел «Сборка geoip»: слить PR → тег vX → дождаться отдачи файла через jsDelivr → только потом менять заголовок routing в панели.'
+            echo
+            echo '```text'
+            head -c 60000 build-report.txt
+            echo '```'
+          } > "$RUNNER_TEMP/pr-body.md"
+          if [ -n "$(gh pr list --head geoip-auto --base main --state open --json number --jq '.[].number')" ]; then
+            gh pr edit geoip-auto --title "$title" --body-file "$RUNNER_TEMP/pr-body.md"
+          else
+            gh pr create --base main --head geoip-auto --title "$title" --body-file "$RUNNER_TEMP/pr-body.md"
+          fi
