@@ -1,69 +1,433 @@
-Сборка geoip-mini.dat — 2026-11-05T17:53:12Z
+Сборка geoip-mini.dat — 2026-11-05T19:13:59Z
 
 Источники
-  fetched_at=2026-11-05T17:42:04Z
+  fetched_at=2026-11-05T19:04:40Z
   ripe_url=https://ftp.ripe.net/pub/stats/ripencc/delegated-ripencc-extended-latest
   ripe_header=2|ripencc|1793833199|261193|19700101|20261104|+0100
   ripe_md5=3edbea24b78ce1cc65fded8b570a38da (сходится с .md5)
   runet_release=https://github.com/runetfreedom/russia-v2ray-rules-dat/releases/tag/202611051123
   runet_sha256=d46c85ee9e5798806b0e706aeadbc50a95124cf18be1ce0126bf717b805db4e6 (сходится с geoip.dat.sha256sum)
-  прошлый файл: prev-v1.0.6-geoip-mini.dat, sha256 a1b7c533aa5b7fedbf5c0f2fbb8f55471cb6cea55673385dd05a2c4da56702db
+  asn_source=https://stat.ripe.net/data/{as-overview,announced-prefixes}
+  asn_fetched=89 из 89
+  asn_failed=нет
+  сети компаний: 89 ASN из direct-asn.txt; из RIPEstat 89, из кэша 0
+  прошлый файл: prev-trial-6a899ff-geoip-mini.dat, sha256 a2833779c124fe3db0ed183a298272edeeb3461ab3d51c83b849c4545a59d78f
+  для сравнения «v1.0.6»: prev-v1.0.6-geoip-mini.dat, sha256 a1b7c533aa5b7fedbf5c0f2fbb8f55471cb6cea55673385dd05a2c4da56702db
 
-Теги (CIDR / IPv4-адресов; было → стало)
-  DIRECT     CIDR 35 987 → 14 944 (−21 043), из них IPv6: 85; адресов 48 992 858 → 49 647 332 (+654 474)
+Теги (CIDR / IPv4-адресов; было в прошлом файле → стало)
+  DIRECT     CIDR 14 944 → 16 250 (+1 306), из них IPv6: 85; адресов 49 647 332 → 48 625 301 (−1 022 031)
   PRIVATE    CIDR 17 → 17 (0), из них IPv6: 4; адресов 575 931 648 → 575 931 648 (0) — перенесён побайтно
   WHITELIST  CIDR 6 710 → 6 710 (0); адресов 219 006 → 219 006 (0) — перенесён побайтно
 
 Состав DIRECT (IPv4)
-  RIPE RU:            45 250 880 адресов (7 413 слитых отрезков)
-  runetfreedom RU:    45 723 705 адресов (13 069 CIDR; IPv6 пропущено: 12 175)
-  ripe:BY (добавка): 1 793 536 адресов
-  CIDR из добавок:    1 088 060 адресов (4 115 строк)
-  из добавок уже есть в RIPE RU ∪ runetfreedom: 0 адресов
-  итого:              49 647 332 адресов, 11 562 отрезков, 14 859 CIDR
+  geoip:ru runetfreedom: 45 723 705 адресов (13 069 CIDR; IPv6 пропущено: 12 175)
+  сети компаний (ASN):   17 098 496 адресов из 89 ASN; сверх geoip:ru — 24 352
+  ripe:BY (добавка):    1 793 536 адресов; сверх geoip:ru и ASN — 1 793 536
+  CIDR из добавок:       1 088 060 адресов (4 115 строк)
+  из добавок уже есть в geoip:ru ∪ ASN: 4 352 адресов
+  итого:                 48 625 301 адресов, 11 846 отрезков, 16 165 CIDR
   IPv6 из прошлого файла перенесено без изменений: 85 CIDR
+  RIPE RU как источник DIRECT не берётся — только ripe:XX из добавок и этот отчёт.
 
-Изменения DIRECT относительно прошлого файла
-  добавилось: 654 474 адресов, 4 737 отрезков
-  убралось:   0 адресов, 0 отрезков
+RIPE RU, но не в России по геобазе (записаны на Россию, стоят за границей или не размечены)
+  RIPE RU: 45 250 880 адресов; из них в geoip:ru 44 208 849, вне geoip:ru 1 042 031
+  из 1 042 031 вне geoip:ru: вернули сети компаний (ASN) 15 392, оставили добавки 0, ушли из DIRECT 1 026 639
+  ушедшее по геобазе: UA 501 486, NL 78 851, US 71 291, KZ 59 902, DE 58 690, SY 24 576, FI 20 562, GB 16 126, SE 15 901, BR 15 104, PL 12 800, FR 12 546, ещё 71 стран 137 264, нет в геобазе 1 540
+  вернувшееся через ASN по геобазе: UA 8 329, NL 1 856, GB 1 280, DE 832, TR 449, US 386, ES 272, FR 272, KZ 265, AE 256, BR 256, ID 256, ещё 14 стран 682, нет в геобазе 1
+  крупнейшие ушедшие (до 20):
+    − 109.254.0.0/16 (65 536) — в RIPE RU, по геобазе UA
+    − 145.249.120.0–145.249.255.255 (34 816) — в RIPE RU, по геобазе KZ
+    − 145.249.0.0–145.249.107.255 (27 648) — в RIPE RU, по геобазе SY
+    − 77.123.192.0/18 (16 384) — в RIPE RU, по геобазе UA
+    − 78.30.192.0/18 (16 384) — в RIPE RU, по геобазе UA
+    − 5.153.128.0–5.153.175.255 (12 288) — в RIPE RU, по геобазе UA
+    − 31.204.3.0–31.204.48.255 (11 776) — в RIPE RU, по геобазе DE
+    − 178.171.0.0–178.171.45.255 (11 776) — в RIPE RU, по геобазе US
+    − 151.0.0.0–151.0.39.255 (10 240) — в RIPE RU, по геобазе UA
+    − 158.46.189.0–158.46.223.255 (8 960) — в RIPE RU, по геобазе BG
+    − 31.28.224.0/19 (8 192) — в RIPE RU, по геобазе UA
+    − 31.135.96.0/19 (8 192) — в RIPE RU, по геобазе UA
+    − 46.35.224.0/19 (8 192) — в RIPE RU, по геобазе UA
+    − 46.172.192.0/19 (8 192) — в RIPE RU, по геобазе UA
+    − 77.121.32.0/19 (8 192) — в RIPE RU, по геобазе UA
+    − 81.162.96.0/19 (8 192) — в RIPE RU, по геобазе UA
+    − 91.247.96.0/19 (8 192) — в RIPE RU, по геобазе UA
+    − 109.110.64.0/19 (8 192) — в RIPE RU, по геобазе UA
+    − 109.200.128.0/19 (8 192) — в RIPE RU, по геобазе UA
+    − 176.99.96.0/19 (8 192) — в RIPE RU, по геобазе UA
+
+Сети компаний (ASN): вклад каждого (сверх geoip:ru — адреса ASN, которых нет в geoip:ru runetfreedom)
+  AS13238    Яндекс — основная сеть (YANDEX LLC)
+             держатель: YANDEX YANDEX LLC; RIPEstat на 2026-11-05T08:00:00, анонсов IPv4 30 (IPv6 пропущено: 17)
+             CIDR 14, адресов 192 768, сверх geoip:ru 3 898 (DE 832, TR 417, US 384, ES 272, FR 272, KZ 264, ещё 17 стран 1 457)
+  AS200350   Яндекс — Yandex Cloud (Yandex.Cloud LLC)
+             держатель: YandexCloud Yandex.Cloud LLC; RIPEstat на 2026-11-05T08:00:00, анонсов IPv4 53 (IPv6 пропущено: 3)
+             CIDR 33, адресов 227 584, сверх geoip:ru 224 (UA 128, NL 64, TR 32)
+  AS210656   Яндекс — Yandex Cloud, выделенные серверы (Yandex.Cloud LLC)
+             держатель: YACLOUDBMS Yandex.Cloud LLC; RIPEstat на 2026-11-05T08:00:00, анонсов IPv4 9
+             CIDR 9, адресов 5 376, сверх geoip:ru 0
+  AS215013   Яндекс — Yandex Cloud CDN (Yandex.Cloud LLC)
+             держатель: YCCDN Yandex.Cloud LLC; RIPEstat на 2026-11-05T08:00:00, анонсов IPv4 10 (IPv6 пропущено: 4)
+             CIDR 6, адресов 2 560, сверх geoip:ru 768 (KZ 512, AE 256)
+  AS44534    Яндекс — офисная сеть (YANDEX LLC)
+             держатель: yandex-office YANDEX LLC; RIPEstat на 2026-11-05T08:00:00, анонсов IPv4 20 (IPv6 пропущено: 7)
+             CIDR 15, адресов 11 264, сверх geoip:ru 0
+  AS202611   Яндекс — Яндекс.Телеком (Yandex.Telecom LLC)
+             держатель: YCTL Yandex.Telecom LLC; RIPEstat на 2026-11-05T08:00:00, анонсов IPv4 2 (IPv6 пропущено: 1)
+             CIDR 2, адресов 1 536, сверх geoip:ru 0
+  AS207207   Яндекс — Яндекс ОФД, оператор фискальных данных (Yandex.OFD LLC)
+             держатель: YL30 Yandex.OFD LLC; RIPEstat на 2026-11-05T08:00:00, анонсов IPv4 1 (IPv6 пропущено: 1)
+             CIDR 1, адресов 256, сверх geoip:ru 0
+  AS47541    VK — ВКонтакте, Санкт-Петербург (LLC VK)
+             держатель: VKONTAKTE-SPB-AS LLC VK; RIPEstat на 2026-11-05T08:00:00, анонсов IPv4 21 (IPv6 пропущено: 8)
+             CIDR 13, адресов 60 928, сверх geoip:ru 256 (NL 256)
+  AS47542    VK — ВКонтакте, CDN в Москве (LLC VK)
+             держатель: VKONTAKTE-MSK-CDN-AS LLC VK; RIPEstat на 2026-11-05T08:00:00, анонсов IPv4 7 (IPv6 пропущено: 1)
+             CIDR 5, адресов 2 048, сверх geoip:ru 0
+  AS28709    VK — ВКонтакте, региональный CDN (LLC VK)
+             держатель: VKONTAKTE-REGIONAL-CDN LLC VK; RIPEstat на 2026-11-05T08:00:00, анонсов IPv4 18 (IPv6 пропущено: 5)
+             CIDR 12, адресов 4 608, сверх geoip:ru 0
+  AS62243    VK — ВКонтакте, Санкт-Петербург (LLC VK)
+             держатель: VKONTAKTE-SPBZN-AS LLC VK; RIPEstat на 2026-11-05T08:00:00, анонсов IPv4 1
+             CIDR 1, адресов 256, сверх geoip:ru 0
+  AS207581   VK — ВКонтакте, Санкт-Петербург (LLC VK)
+             держатель: VKONTAKTE-SPBKM-AS LLC VK; RIPEstat на 2026-11-05T08:00:00, анонсов IPv4 2
+             CIDR 2, адресов 512, сверх geoip:ru 0
+  AS47764    VK — бывшая сеть Mail.ru: почта, облако, VK Cloud (LLC VK)
+             держатель: VK-AS LLC VK; RIPEstat на 2026-11-05T08:00:00, анонсов IPv4 99 (IPv6 пропущено: 7)
+             CIDR 86, адресов 148 992, сверх geoip:ru 3 584 (NL 1 536, GB 1 024, KZ 1 024)
+  AS60863    VK — сеть VK (LLC VK)
+             держатель: VK-AS LLC VK; RIPEstat на 2026-11-05T08:00:00, анонсов IPv4 1
+             CIDR 1, адресов 1 024, сверх geoip:ru 0
+  AS49797    VK — сеть VK, бывшая NESSLY (LLC VK)
+             держатель: NESSLY LLC VK; RIPEstat на 2026-11-05T08:00:00, анонсов IPv4 1
+             CIDR 1, адресов 256, сверх geoip:ru 0
+  AS49988    VK — Одноклассники (LLC VK)
+             держатель: odkl-as LLC VK; RIPEstat на 2026-11-05T08:00:00, анонсов IPv4 2
+             CIDR 2, адресов 512, сверх geoip:ru 0
+  AS57973    VK — облачный гейминг VK Play (LLC VK)
+             держатель: CLOUDGAMING-REGION-AS LLC VK; RIPEstat на 2026-11-05T08:00:00, анонсов IPv4 3
+             CIDR 3, адресов 768, сверх geoip:ru 0
+  AS207970   VK — сеть Mail.ru (LLC VK)
+             держатель: mailru-as LLC VK; RIPEstat на 2026-11-05T08:00:00, анонсов IPv4 1
+             CIDR 1, адресов 256, сверх geoip:ru 0
+  AS213235   VK — сеть Mail.ru (LLC VK)
+             держатель: mailru-as LLC VK; RIPEstat на 2026-11-05T08:00:00, анонсов IPv4 1
+             CIDR 1, адресов 256, сверх geoip:ru 0
+  AS35237    Сбер — основная сеть Сбербанка (Sberbank of Russia PJSC)
+             держатель: Sberbank Sberbank of Russia PJSC; RIPEstat на 2026-11-05T08:00:00, анонсов IPv4 15 (IPv6 пропущено: 1)
+             CIDR 8, адресов 3 584, сверх geoip:ru 0
+  AS43396    Сбер — Новосибирск (Sberbank of Russia PJSC)
+             держатель: Sber-NSK-AS Sberbank of Russia PJSC; RIPEstat на 2026-11-05T08:00:00, анонсов IPv4 1
+             CIDR 1, адресов 256, сверх geoip:ru 0
+  AS44408    Сбер — Самара (Sberbank of Russia PJSC)
+             держатель: Sber-SMR-AS Sberbank of Russia PJSC; RIPEstat на 2026-11-05T08:00:00, анонсов IPv4 1
+             CIDR 1, адресов 256, сверх geoip:ru 0
+  AS45000    Сбер — Екатеринбург (Sberbank of Russia PJSC)
+             держатель: Sber-EKB-AS Sberbank of Russia PJSC; RIPEstat на 2026-11-05T08:00:00, анонсов IPv4 1
+             CIDR 1, адресов 256, сверх geoip:ru 0
+  AS47457    Сбер — Балаково (Sberbank of Russia PJSC)
+             держатель: SBERBANK-BALAKOVO-AS Sberbank of Russia PJSC; RIPEstat на 2026-11-05T08:00:00, анонсов IPv4 3
+             CIDR 3, адресов 768, сверх geoip:ru 0
+  AS60122    Сбер — VDI (Sberbank of Russia PJSC)
+             держатель: SBERBANK-VDI Sberbank of Russia PJSC; RIPEstat на 2026-11-05T08:00:00, анонсов IPv4 1
+             CIDR 1, адресов 256, сверх geoip:ru 0
+  AS205161   Сбер — Санкт-Петербург (Sberbank of Russia PJSC)
+             держатель: Sber-SPB-AS Sberbank of Russia PJSC; RIPEstat на 2026-11-05T08:00:00, анонсов IPv4 1
+             CIDR 1, адресов 256, сверх geoip:ru 0
+  AS206673   Сбер — Сбербанк-Телеком (Sberbank-Telecom LLC)
+             держатель: Sberbank-Telecom Sberbank-Telecom LLC; RIPEstat на 2026-11-05T08:00:00, анонсов IPv4 5
+             CIDR 3, адресов 3 072, сверх geoip:ru 0
+  AS205221   Сбер — СберКорус, электронный документооборот (SBERKORUS LLC)
+             держатель: SBERKORUS SBERKORUS LLC; RIPEstat на 2026-11-05T08:00:00, анонсов IPv4 2
+             CIDR 2, адресов 512, сверх geoip:ru 0
+  AS43399    Т-Банк — основная сеть (АО «ТБанк»)
+             держатель: TCS-AS "TBANK" JSC; RIPEstat на 2026-11-05T08:00:00, анонсов IPv4 20
+             CIDR 5, адресов 3 328, сверх geoip:ru 0
+  AS205638   Т-Банк — Москва (АО «ТБанк»)
+             держатель: TM-AS-MSK "TBANK" JSC; RIPEstat на 2026-11-05T08:00:00, анонсов IPv4 22
+             CIDR 5, адресов 5 120, сверх geoip:ru 0
+  AS28712    Т-Банк — T-Media (АО «ТБанк»)
+             держатель: T-Media "TBANK" JSC; RIPEstat на 2026-11-05T08:00:00, анонсов IPv4 4
+             CIDR 2, адресов 768, сверх geoip:ru 0
+  AS12686    Т-Банк — бывший Росбанк (АО «ТБанк»)
+             держатель: rosbank-as "TBANK" JSC; RIPEstat на 2026-11-05T08:00:00, анонсов IPv4 6
+             CIDR 4, адресов 1 280, сверх geoip:ru 0
+  AS202498   Т-Банк — Т-Мобайл (T-MOB LLC)
+             держатель: TinkoffMobile-AS T-MOB LLC; RIPEstat на 2026-11-05T08:00:00, анонсов IPv4 4
+             CIDR 1, адресов 1 024, сверх geoip:ru 0
+  AS15632    Альфа-Банк — основная сеть (АО «Альфа-Банк»)
+             держатель: Alfa-Bank-AS JSC "Alfa-Bank"; RIPEstat на 2026-11-05T08:00:00, анонсов IPv4 13 (IPv6 пропущено: 1)
+             CIDR 5, адресов 3 328, сверх geoip:ru 0
+  AS59840    Альфа-Банк — бывший Балтийский банк (АО «Альфа-Банк»)
+             держатель: BALTBANK-AS JSC "Alfa-Bank"; RIPEstat на 2026-11-05T08:00:00, анонсов IPv4 1
+             CIDR 1, адресов 256, сверх geoip:ru 0
+  AS24823    ВТБ — основная сеть (VTB Bank PJSC)
+             держатель: VTB-BANK-AS VTB Bank (Public Joint-Stock Company); RIPEstat на 2026-11-05T08:00:00, анонсов IPv4 13
+             CIDR 3, адресов 5 632, сверх geoip:ru 0
+  AS41551    ВТБ (VTB Bank PJSC)
+             держатель: VTB-AS VTB Bank (Public Joint-Stock Company); RIPEstat на 2026-11-05T08:00:00, анонсов IPv4 2
+             CIDR 2, адресов 512, сверх geoip:ru 0
+  AS60702    ВТБ (VTB Bank PJSC)
+             держатель: VTB-BANK VTB Bank (Public Joint-Stock Company); RIPEstat на 2026-11-05T08:00:00, анонсов IPv4 1
+             CIDR 1, адресов 256, сверх geoip:ru 0
+  AS41226    ВТБ (VTB Bank PJSC)
+             держатель: SUPERBANK-RU-AS VTB Bank (Public Joint-Stock Company); RIPEstat на 2026-11-05T08:00:00, анонсов IPv4 1
+             CIDR 1, адресов 256, сверх geoip:ru 0
+  AS41430    ВТБ — РНКБ (VTB Bank PJSC)
+             держатель: RNCB-AS VTB Bank (Public Joint-Stock Company); RIPEstat на 2026-11-05T08:00:00, анонсов IPv4 2 (IPv6 пропущено: 1)
+             CIDR 2, адресов 512, сверх geoip:ru 0
+  AS44386    Ozon — маркетплейс (ООО «Интернет Решения», юрлицо Ozon)
+             держатель: OZON-AS LLC Internet Solutions; RIPEstat на 2026-11-05T08:00:00, анонсов IPv4 9
+             CIDR 5, адресов 2 304, сверх geoip:ru 0
+  AS207986   Ozon — Ozon Банк (LLC OZON BANK)
+             держатель: OZON-BANK-AS LLC OZON BANK; RIPEstat на 2026-11-05T08:00:00, анонсов IPv4 8
+             CIDR 3, адресов 2 304, сверх geoip:ru 0
+  AS57073    Wildberries — основная сеть (LLC Wildberries)
+             держатель: Wildberries-AS LLC Wildberries; RIPEstat на 2026-11-05T08:00:00, анонсов IPv4 18 (IPv6 пропущено: 5)
+             CIDR 11, адресов 5 376, сверх geoip:ru 0
+  AS49053    Wildberries — WB Tech (LLC Wildberries)
+             держатель: AS_WB-TECH LLC Wildberries; RIPEstat на 2026-11-05T08:00:00, анонсов IPv4 1
+             CIDR 1, адресов 256, сверх geoip:ru 0
+  AS201512   Wildberries — CDN (LLC Wildberries)
+             держатель: AS_WILDBERRIES_CDN LLC Wildberries; RIPEstat на 2026-11-05T08:00:00, анонсов IPv4 7 (IPv6 пропущено: 1)
+             CIDR 3, адресов 1 792, сверх geoip:ru 0
+  AS201513   Wildberries — Казахстан (LLC Wildberries)
+             держатель: AS_WILDBERRIES_KZ LLC Wildberries; RIPEstat на 2026-11-05T08:00:00, анонсов IPv4 1 (IPv6 пропущено: 2)
+             CIDR 1, адресов 256, сверх geoip:ru 0
+  AS211517   Wildberries — Грузия (LLC Wildberries)
+             держатель: AS_WILDBERRIES_GE LLC Wildberries; RIPEstat на 2026-11-05T08:00:00, анонсов IPv4 1 (IPv6 пропущено: 2)
+             CIDR 1, адресов 256, сверх geoip:ru 0
+  AS215070   Wildberries — Беларусь (LLC Wildberries)
+             держатель: AS_WILDBERRIES_BY LLC Wildberries; RIPEstat на 2026-11-05T08:00:00, анонсов IPv4 1 (IPv6 пропущено: 2)
+             CIDR 1, адресов 256, сверх geoip:ru 0
+  AS213105   Wildberries — еАптека (LLC Wildberries)
+             держатель: AS_eAPTEKA LLC Wildberries; RIPEstat на 2026-11-05T08:00:00, анонсов IPv4 1
+             CIDR 1, адресов 256, сверх geoip:ru 0
+  AS201012   Avito (ООО «КЕХ еКоммерц», юрлицо Avito)
+             держатель: Avito_LLC KEH eCommerce LLC; RIPEstat на 2026-11-05T08:00:00, анонсов IPv4 18
+             CIDR 4, адресов 3 328, сверх geoip:ru 0
+  AS196747   Электронное правительство Ростелекома: digital.gov.ru, госсистемы (Electronic-government PJSC Rostel
+             держатель: Electronic-government PJSC Rostelecom; RIPEstat на 2026-11-05T08:00:00, анонсов IPv4 6
+             CIDR 1, адресов 4 096, сверх geoip:ru 0
+  AS49186    НИИ «Восход» — институт Минцифры, госсистемы (ФГАУ НИИ «Восход»)
+             держатель: VOSKHOD-AS Federal State Institution Research and Development Institute "Voskhod", FGAU; RIPEstat на 2026-11-05T08:00:00, анонсов IPv4 2
+             CIDR 2, адресов 512, сверх geoip:ru 0
+  AS12389    Ростелеком — основная сеть; здесь же Госуслуги (PJSC Rostelecom)
+             держатель: ROSTELECOM-AS PJSC Rostelecom; RIPEstat на 2026-11-05T08:00:00, анонсов IPv4 3 159 (IPv6 пропущено: 122)
+             CIDR 872, адресов 9 552 384, сверх geoip:ru 8 193 (UA 8 192, US 1)
+  AS48044    Ростелеком — Ростелеком ИТ (Rostelecom Information Technologies)
+             держатель: ROSTELECOMIT-AS Rostelecom Information Technologies LTd; RIPEstat на 2026-11-05T08:00:00, анонсов IPv4 1
+             CIDR 1, адресов 1 024, сверх geoip:ru 0
+  AS8359     МТС — основная сеть (MTS PJSC)
+             держатель: MTS MTS PJSC; RIPEstat на 2026-11-05T08:00:00, анонсов IPv4 436 (IPv6 пропущено: 57)
+             CIDR 172, адресов 1 719 552, сверх geoip:ru 2 (UA 1, US 1)
+  AS60490    МТС — MTS Cloud (MTS PJSC)
+             держатель: MTS-CLOUD MTS PJSC; RIPEstat на 2026-11-05T08:00:00, анонсов IPv4 68 (IPv6 пропущено: 2)
+             CIDR 45, адресов 21 504, сверх geoip:ru 0
+  AS209024   МТС — MTS Cloud (MTS PJSC)
+             держатель: MTS-CLOUD-A MTS PJSC; RIPEstat на 2026-11-05T08:00:00, анонсов IPv4 46 (IPv6 пропущено: 2)
+             CIDR 29, адресов 12 800, сверх geoip:ru 0
+  AS44677    МТС — облако (MTS PJSC)
+             держатель: MTS-NGCLOUD-AS MTS PJSC; RIPEstat на 2026-11-05T08:00:00, анонсов IPv4 11 (IPv6 пропущено: 2)
+             CIDR 9, адресов 5 120, сверх geoip:ru 0
+  AS51771    МТС — МТС Банк (ПАО «МТС-Банк»)
+             держатель: MTSBANK Public Joint-Stock Company "MTS Bank"; RIPEstat на 2026-11-05T08:00:00, анонсов IPv4 2
+             CIDR 2, адресов 512, сверх geoip:ru 0
+  AS58100    МТС — МТС Банк, бывший Далькомбанк (ПАО «МТС-Банк»)
+             держатель: DALCOMBANK-AS Public Joint-Stock Company "MTS Bank"; RIPEstat на 2026-11-05T08:00:00, анонсов IPv4 1
+             CIDR 1, адресов 256, сверх geoip:ru 0
+  AS31133    МегаФон — мобильная сеть (PJSC MegaFon)
+             держатель: MF-MGSM-AS PJSC MegaFon; RIPEstat на 2026-11-05T08:00:00, анонсов IPv4 484 (IPv6 пропущено: 66)
+             CIDR 53, адресов 825 088, сверх geoip:ru 0
+  AS12714    МегаФон — домашний интернет (PJSC MegaFon)
+             держатель: MEGAFON-AS PJSC MegaFon; RIPEstat на 2026-11-05T08:00:00, анонсов IPv4 313 (IPv6 пропущено: 2)
+             CIDR 98, адресов 1 199 872, сверх geoip:ru 1 (CH 1)
+  AS25159    МегаФон — Москва; здесь же megafon.ru (PJSC MegaFon)
+             держатель: SONICDUO-AS PJSC MegaFon; RIPEstat на 2026-11-05T08:00:00, анонсов IPv4 69 (IPv6 пропущено: 19)
+             CIDR 47, адресов 139 776, сверх geoip:ru 0
+  AS8263     МегаФон — облако (PJSC MegaFon)
+             держатель: Cloud-Megafon PJSC MegaFon; RIPEstat на 2026-11-05T08:00:00, анонсов IPv4 3
+             CIDR 2, адресов 768, сверх geoip:ru 0
+  AS24866    МегаФон — облако (PJSC MegaFon)
+             держатель: Cloud-Megafon PJSC MegaFon; RIPEstat на 2026-11-05T08:00:00, анонсов IPv4 6
+             CIDR 5, адресов 1 536, сверх geoip:ru 0
+  AS3216     Билайн — основная сеть (PJSC «Vimpelcom»)
+             держатель: SOVAM-AS PJSC "Vimpelcom"; RIPEstat на 2026-11-05T08:00:00, анонсов IPv4 542 (IPv6 пропущено: 6)
+             CIDR 136, адресов 973 056, сверх geoip:ru 2 (KZ 1, нет в геобазе 1)
+  AS8402     Билайн — домашний интернет, бывшая Корбина (PJSC «Vimpelcom»)
+             держатель: CORBINA-AS PJSC "Vimpelcom"; RIPEstat на 2026-11-05T08:00:00, анонсов IPv4 393 (IPv6 пропущено: 2)
+             CIDR 18, адресов 2 222 080, сверх geoip:ru 1 (нет в геобазе 1)
+  AS16345    Билайн — мобильная сеть; здесь же beeline.ru (PJSC «Vimpelcom»)
+             держатель: BEE-AS PJSC "Vimpelcom"; RIPEstat на 2026-11-05T08:00:00, анонсов IPv4 175 (IPv6 пропущено: 22)
+             CIDR 92, адресов 282 880, сверх geoip:ru 0
+  AS15378    Т2 — основная сеть (T2 Mobile LLC)
+             держатель: TELE2-RU-AS T2 Mobile LLC; RIPEstat на 2026-11-05T08:00:00, анонсов IPv4 7
+             CIDR 7, адресов 30 464, сверх geoip:ru 0
+  AS12958    Т2 — Москва (T2 Mobile LLC)
+             держатель: MCC T2 Mobile LLC; RIPEstat на 2026-11-05T08:00:00, анонсов IPv4 22
+             CIDR 10, адресов 57 088, сверх geoip:ru 0
+  AS209030   Касперский — Россия (АО «Лаборатория Касперского»)
+             держатель: KL-KDP AO Kaspersky Lab; RIPEstat на 2026-11-05T08:00:00, анонсов IPv4 6 (IPv6 пропущено: 1)
+             CIDR 3, адресов 1 536, сверх geoip:ru 0
+  AS200107   Касперский — дата-центры в Швейцарии и других странах (Kaspersky Lab Switzerland GmbH)
+             держатель: KL-EXT Kaspersky Lab Switzerland GmbH; RIPEstat на 2026-11-05T08:00:00, анонсов IPv4 41 (IPv6 пропущено: 31)
+             CIDR 15, адресов 10 240, сверх geoip:ru 5 632 (CH 3 072, GB 2 048, DE 512)
+  AS41983    Касперский — Швейцария (Kaspersky Lab Switzerland GmbH)
+             держатель: KL-AS Kaspersky Lab Switzerland GmbH; RIPEstat на 2026-11-05T08:00:00, анонсов IPv4 2 (IPv6 пропущено: 1)
+             CIDR 2, адресов 2 560, сверх geoip:ru 1 792 (CH 1 792)
+  AS61293    1С (АО «1С ГРУПП»)
+             держатель: RU1C-as JSC "1C GROUP"; RIPEstat на 2026-11-05T08:00:00, анонсов IPv4 5
+             CIDR 1, адресов 1 024, сверх geoip:ru 0
+  AS24638    Rambler — основная сеть (Rambler Internet Holding LLC)
+             держатель: RAMBLER-TELECOM-AS Rambler Internet Holding LLC; RIPEstat на 2026-11-05T08:00:00, анонсов IPv4 3 (IPv6 пропущено: 1)
+             CIDR 3, адресов 9 472, сверх geoip:ru 0
+  AS42481    Rambler — бывший Бегун (Rambler Internet Holding LLC)
+             держатель: BEGUN-AS Rambler Internet Holding LLC; RIPEstat на 2026-11-05T08:00:00, анонсов IPv4 1
+             CIDR 1, адресов 1 024, сверх geoip:ru 0
+  AS44696    Rambler — бывший SUP, LiveJournal (Rambler Internet Holding LLC)
+             держатель: SUP-AS Rambler Internet Holding LLC; RIPEstat на 2026-11-05T08:00:00, анонсов IPv4 1
+             CIDR 1, адресов 4 096, сверх geoip:ru 0
+  AS57306    Rambler — бывший WebPrime (Rambler Internet Holding LLC)
+             держатель: WEBPRIMEGROUP-AS Rambler Internet Holding LLC; RIPEstat на 2026-11-05T08:00:00, анонсов IPv4 1
+             CIDR 1, адресов 512, сверх geoip:ru 0
+  AS44704    X5 — Пятёрочка, Перекрёсток (ООО «Перекрёсток-2000»)
+             держатель: X5-RETAIL-GROUP-AS Perekrestok-2000 LLC; RIPEstat на 2026-11-05T08:00:00, анонсов IPv4 3
+             CIDR 3, адресов 1 280, сверх geoip:ru 0
+  AS215810   X5 — корпоративный центр (PJSC X5 Corporate Center)
+             держатель: X5-CorporateCenter PJSC X5 Corporate Center; RIPEstat на 2026-11-05T08:00:00, анонсов IPv4 1
+             CIDR 1, адресов 256, сверх geoip:ru 0
+  AS21292    НСПК — платёжная система «Мир» (АО «НСПК»)
+             держатель: NSPK Joint-stock company "National system of payment cards"; RIPEstat на 2026-11-05T08:00:00, анонсов IPv4 2
+             CIDR 2, адресов 512, сверх geoip:ru 0
+  AS41185    НСПК (АО «НСПК»)
+             держатель: NSPK-EC-AS National system of payment cards Joint-stock Society; RIPEstat на 2026-11-05T08:00:00, анонсов IPv4 3
+             CIDR 1, адресов 512, сверх geoip:ru 0
+  AS41187    НСПК — Система быстрых платежей (АО «НСПК»)
+             держатель: NSPK-SBP-AS National system of payment cards Joint-stock Society; RIPEstat на 2026-11-05T08:00:00, анонсов IPv4 3
+             CIDR 1, адресов 512, сверх geoip:ru 0
+  AS50339    НСПК (АО «НСПК»)
+             держатель: NSPK Joint-stock company "National system of payment cards"; RIPEstat на 2026-11-05T08:00:00, анонсов IPv4 2
+             CIDR 2, адресов 512, сверх geoip:ru 0
+  AS60967    НСПК (АО «НСПК»)
+             держатель: IPPS-AS National system of payment cards Joint-stock Society; RIPEstat на 2026-11-05T08:00:00, анонсов IPv4 1
+             CIDR 1, адресов 256, сверх geoip:ru 0
+  AS49002    Почта России (АО «Почта России»)
+             держатель: RUSPOST JSC "Russian Post"; RIPEstat на 2026-11-05T08:00:00, анонсов IPv4 5
+             CIDR 2, адресов 1 280, сверх geoip:ru 0
+  AS35022    Газпромбанк — основная сеть (АО «Газпромбанк»)
+             держатель: GAZPROMBANK Gazprombank JSC; RIPEstat на 2026-11-05T08:00:00, анонсов IPv4 2
+             CIDR 2, адресов 768, сверх geoip:ru 0
+  AS48033    Газпромбанк (АО «Газпромбанк»)
+             держатель: GAZ-AS JSC Gazprombank; RIPEstat на 2026-11-05T08:00:00, анонсов IPv4 1
+             CIDR 1, адресов 256, сверх geoip:ru 0
+  AS51536    Газпромбанк — Красноярск (АО «Газпромбанк»)
+             держатель: GAZPROMBANK-KRASNOYARSK-AS Gazprombank (JSC); RIPEstat на 2026-11-05T08:00:00, анонсов IPv4 1
+             CIDR 1, адресов 256, сверх geoip:ru 0
+  итого: 17 098 496 адресов, сверх geoip:ru 24 352 (UA 8 329, CH 4 865, GB 3 328, NL 1 856, KZ 1 801, DE 1 344, TR 449, US 386, ES 272, FR 272, AE 256, BR 256, ещё 14 стран 937, нет в геобазе 1)
+
+Изменения DIRECT относительно прошлого файла (prev-trial-6a899ff-geoip-mini.dat)
+  IPv4: CIDR 14 859 → 16 165, адресов 49 647 332 → 48 625 301 (−1 022 031); IPv6 CIDR 85 → 85
+  добавилось: 4 608 адресов, 9 отрезков
+  убралось:   1 026 639 адресов, 1 077 отрезков; из них «RIPE RU, но не в geoip:ru» 1 026 639
+  убранное по геобазе: UA 501 486, NL 78 851, US 71 291, KZ 59 902, DE 58 690, SY 24 576, FI 20 562, GB 16 126, SE 15 901, BR 15 104, PL 12 800, FR 12 546, ещё 71 стран 137 264, нет в геобазе 1 540
   крупнейшие добавленные (до 20):
-    + 145.249.120.0–145.249.255.255 (34 816) — RIPE RU
-    + 57.87.0.0/17 (32 768) — runetfreedom RU
-    + 145.249.0.0–145.249.107.255 (27 648) — RIPE RU
-    + 159.200.128.0/18 (16 384) — RIPE RU + runetfreedom RU
-    + 178.171.0.0–178.171.56.255 (14 592) — RIPE RU + runetfreedom RU
-    + 5.153.128.0–5.153.175.255 (12 288) — RIPE RU
-    + 168.113.128.0–168.113.175.255 (12 288) — RIPE RU + runetfreedom RU
-    + 158.46.190.0–158.46.223.255 (8 704) — RIPE RU
-    + 212.124.96.0/19 (8 192) — RIPE RU + runetfreedom RU
-    + 31.204.3.0–31.204.31.255 (7 424) — RIPE RU
-    + 158.46.143.0–158.46.167.255 (6 400) — RIPE RU + runetfreedom RU
-    + 89.184.0.0–89.184.21.255 (5 632) — RIPE RU + runetfreedom RU
-    + 94.159.96.0–94.159.112.255 (4 352) — RIPE RU
-    + 85.28.48.0/20 (4 096) — RIPE RU + runetfreedom RU
-    + 109.238.192.0/20 (4 096) — RIPE RU
-    + 137.22.144.0/20 (4 096) — RIPE RU + runetfreedom RU
-    + 160.5.208.0/20 (4 096) — RIPE RU + runetfreedom RU
-    + 46.149.128.0–46.149.141.255 (3 584) — RIPE RU
-    + 147.45.66.0–147.45.79.255 (3 584) — RIPE RU
-    + 94.187.192.0–94.187.203.255 (3 072) — RIPE RU + runetfreedom RU
+    + 185.54.220.0/22 (1 024) — ASN AS200107
+    + 185.201.0.0/22 (1 024) — ASN AS200107
+    + 37.203.128.0/23 (512) — ASN AS200107
+    + 80.173.148.0/23 (512) — ASN AS200107
+    + 82.202.184.0/23 (512) — ASN AS200107
+    + 91.198.230.0/24 (256) — ASN AS200107
+    + 93.159.227.0/24 (256) — ASN AS200107
+    + 185.85.15.0/24 (256) — ASN AS200107
+    + 195.64.114.0/24 (256) — ASN AS200107
   крупнейшие убранные (до 20):
-    нет
+    − 109.254.0.0/16 (65 536) — в RIPE RU, по геобазе UA
+    − 145.249.120.0–145.249.255.255 (34 816) — в RIPE RU, по геобазе KZ
+    − 145.249.0.0–145.249.107.255 (27 648) — в RIPE RU, по геобазе SY
+    − 77.123.192.0/18 (16 384) — в RIPE RU, по геобазе UA
+    − 78.30.192.0/18 (16 384) — в RIPE RU, по геобазе UA
+    − 5.153.128.0–5.153.175.255 (12 288) — в RIPE RU, по геобазе UA
+    − 31.204.3.0–31.204.48.255 (11 776) — в RIPE RU, по геобазе DE
+    − 178.171.0.0–178.171.45.255 (11 776) — в RIPE RU, по геобазе US
+    − 151.0.0.0–151.0.39.255 (10 240) — в RIPE RU, по геобазе UA
+    − 158.46.189.0–158.46.223.255 (8 960) — в RIPE RU, по геобазе BG
+    − 31.28.224.0/19 (8 192) — в RIPE RU, по геобазе UA
+    − 31.135.96.0/19 (8 192) — в RIPE RU, по геобазе UA
+    − 46.35.224.0/19 (8 192) — в RIPE RU, по геобазе UA
+    − 46.172.192.0/19 (8 192) — в RIPE RU, по геобазе UA
+    − 77.121.32.0/19 (8 192) — в RIPE RU, по геобазе UA
+    − 81.162.96.0/19 (8 192) — в RIPE RU, по геобазе UA
+    − 91.247.96.0/19 (8 192) — в RIPE RU, по геобазе UA
+    − 109.110.64.0/19 (8 192) — в RIPE RU, по геобазе UA
+    − 109.200.128.0/19 (8 192) — в RIPE RU, по геобазе UA
+    − 176.99.96.0/19 (8 192) — в RIPE RU, по геобазе UA
+
+Изменения DIRECT относительно v1.0.6
+  IPv4: CIDR 35 902 → 16 165, адресов 48 992 858 → 48 625 301 (−367 557); IPv6 CIDR 85 → 85
+  добавилось: 198 275 адресов, 3 911 отрезков
+  убралось:   565 832 адресов, 926 отрезков; из них «RIPE RU, но не в geoip:ru» 565 832
+  убранное по геобазе: UA 472 993, NL 25 862, DE 19 067, US 6 655, AU 6 653, GB 6 388, KZ 5 885, BR 3 840, BY 2 816, FR 2 320, FI 1 060, GE 1 024, ещё 31 стран 11 265, нет в геобазе 4
+  крупнейшие добавленные (до 20):
+    + 57.87.0.0/17 (32 768) — geoip:ru
+    + 159.200.128.0/18 (16 384) — geoip:ru
+    + 168.113.128.0–168.113.175.255 (12 288) — geoip:ru + ASN AS47764
+    + 160.5.208.0/20 (4 096) — geoip:ru + ASN AS47764
+    + 94.187.192.0–94.187.203.255 (3 072) — geoip:ru
+    + 129.101.112.0/21 (2 048) — geoip:ru
+    + 146.255.216.0/21 (2 048) — geoip:ru
+    + 155.212.224.0/21 (2 048) — geoip:ru
+    + 165.231.148.0–165.231.155.255 (2 048) — geoip:ru
+    + 195.96.40.0/21 (2 048) — geoip:ru
+    + 212.124.112.0/21 (2 048) — geoip:ru
+    + 93.171.16.0–93.171.22.255 (1 792) — geoip:ru
+    + 200.169.179.0–200.169.185.255 (1 792) — geoip:ru
+    + 46.174.104.0–46.174.109.255 (1 536) — geoip:ru
+    + 77.91.70.0–77.91.75.255 (1 536) — geoip:ru
+    + 176.58.45.0–176.58.50.255 (1 536) — geoip:ru
+    + 176.58.38.44–176.58.43.255 (1 492) — geoip:ru
+    + 37.233.82.0–37.233.86.255 (1 280) — geoip:ru
+    + 178.158.169.0–178.158.173.255 (1 280) — geoip:ru
+    + 5.59.204.0/22 (1 024) — geoip:ru
+  крупнейшие убранные (до 20):
+    − 77.123.192.0/18 (16 384) — в RIPE RU, по геобазе UA
+    − 78.30.192.0/18 (16 384) — в RIPE RU, по геобазе UA
+    − 109.254.94.0–109.254.148.255 (14 080) — в RIPE RU, по геобазе UA
+    − 109.254.0.0–109.254.47.255 (12 288) — в RIPE RU, по геобазе UA
+    − 109.254.206.0–109.254.251.255 (11 776) — в RIPE RU, по геобазе UA
+    − 109.254.150.0–109.254.191.255 (10 752) — в RIPE RU, по геобазе UA
+    − 151.0.0.0–151.0.39.255 (10 240) — в RIPE RU, по геобазе UA
+    − 31.28.224.0/19 (8 192) — в RIPE RU, по геобазе UA
+    − 31.135.96.0/19 (8 192) — в RIPE RU, по геобазе UA
+    − 46.35.224.0/19 (8 192) — в RIPE RU, по геобазе UA
+    − 46.172.192.0/19 (8 192) — в RIPE RU, по геобазе UA
+    − 77.121.32.0/19 (8 192) — в RIPE RU, по геобазе UA
+    − 81.162.96.0/19 (8 192) — в RIPE RU, по геобазе UA
+    − 91.247.96.0/19 (8 192) — в RIPE RU, по геобазе UA
+    − 109.110.64.0/19 (8 192) — в RIPE RU, по геобазе UA
+    − 109.200.128.0/19 (8 192) — в RIPE RU, по геобазе UA
+    − 176.99.96.0/19 (8 192) — в RIPE RU, по геобазе UA
+    − 176.109.224.0/19 (8 192) — в RIPE RU, по геобазе UA
+    − 176.124.0.0/19 (8 192) — в RIPE RU, по геобазе UA
+    − 188.114.192.0/19 (8 192) — в RIPE RU, по геобазе UA
 
 Файл
-  размер: 428 248 → 217 818 байт (−49.1 %; предел +20 %)
-  sha256: a2833779c124fe3db0ed183a298272edeeb3461ab3d51c83b849c4545a59d78f
+  размер: 217 818 → 230 878 байт (+6.0 %; предел +20 %)
+  sha256: 9c72306a369f63300f8945d1b6b163a8f76074dabcf055719dc2974f67d30bad
 
 Проверки сборки
   теги на месте и в прежнем порядке: DIRECT, PRIVATE, WHITELIST
   PRIVATE, WHITELIST — побайтно как в прошлом файле
+  предохранитель потери DIRECT (больше 10 %): включён; потеря 2.1 %
+  ВНИМАНИЕ: DIRECT потерял 2.1 % адресов — посмотреть «убралось».
   итог: ok
 
 Проверка файла своим разбором
   теги: DIRECT, PRIVATE, WHITELIST
   PRIVATE: IPv4 CIDR 13, адресов 575931648, IPv6 CIDR 4
   WHITELIST: IPv4 CIDR 6710, адресов 219006, IPv6 CIDR 0
-  DIRECT: IPv4 CIDR 14859, адресов 49647332, IPv6 CIDR 85
+  DIRECT: IPv4 CIDR 16165, адресов 48625301, IPv6 CIDR 85
+  адреса с известным ответом: 11 из 11 как надо
   PRIVATE побайтно как в прошлом файле
   WHITELIST побайтно как в прошлом файле
 
@@ -71,5 +435,6 @@
   Xray 26.10.31 (Xray, Penetrates Everything.) a4a3dff (go1.27.2 darwin/arm64)
   xray run -test (geoip:private, geoip:whitelist, geoip:direct): Configuration OK
   несуществующий тег ядро отвергает — файл действительно читается
-  маршрутизация ядром: 616 адресов, совпало 616 (t-whitelist 70, miss 359, t-private 24, t-direct 163)
+  маршрутизация ядром: 617 адресов, совпало 617 (t-whitelist 70, miss 359, t-private 24, t-direct 164)
+  адреса с известным ответом (правило geoip:direct первым): 11 из 11 как надо
   итог проверки: ok
